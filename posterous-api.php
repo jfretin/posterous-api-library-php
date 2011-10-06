@@ -6,7 +6,7 @@ Version: 0.1.0
 Author URI: http://calvinf.com/
 License:  MIT License (see LICENSE) http://creativecommons.org/licenses/MIT/
 Warranties: None
-Last Modified: December 07, 2009
+Last Modified: October 06 2011
 Requirements: PHP 5 or higher.
 */
 
@@ -32,10 +32,12 @@ class PosterousException extends Exception {}
 class PosterousAPI {
 	private $user;
 	private $pass;
+	private $apiToken;
 
-	function __construct($user = NULL, $pass = NULL) {
+	function __construct($user = NULL, $pass = NULL, $apiToken = NULL) {
 		$this->user = $user;
 		$this->pass = $pass;
+		$this->apiToken = $apiToken;
 	}
 
 	/* Reading Methods - http://posterous.com/api/reading */
@@ -109,7 +111,7 @@ class PosterousAPI {
 	function getpost($args) {
 		$api_method = 'getpost';
 
-		$valid_args = array('id');
+		$valid_args = array('site_id', 'id');
 		$method_args = $this->_validate($args, $valid_args);
 
 		$xml = $this->_call( $api_method, $method_args );
@@ -157,7 +159,12 @@ class PosterousAPI {
 		}
 
 		curl_setopt($ch, CURLOPT_POST, 1);
-
+		
+		if (!is_array($method_args)) {
+			$method_args = array();
+		}
+		$method_args['apiToken'] = $this->apiToken;
+		
 		if ( is_array($method_args) && !empty($method_args) ) {
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $method_args);
 		}
